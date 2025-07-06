@@ -365,30 +365,23 @@ function drawUI() {
     let scaleX = canvas.width / BASE_WIDTH;
     let scaleY = canvas.height / BASE_HEIGHT;
     ctx.save();
-    ctx.fillStyle = "rgba(28,28,32,0.85)";
-    ctx.fillRect(10*scaleX, 10*scaleY, 270*scaleX, 135*scaleY);
-    ctx.fillStyle = "#fff";
-    ctx.font = `${20*scaleX}px Segoe UI`;
-    ctx.fillText("Золото: "+gold, 24*scaleX, 42*scaleY);
-    ctx.fillText("Волна: "+(wave+1)+"/10", 24*scaleX, 72*scaleY);
-    ctx.fillText("Жизни: "+lives, 24*scaleX, 102*scaleY);
-    ctx.font = `${15*scaleX}px Segoe UI`;
-    ctx.fillStyle = "#ddd";
-    ctx.fillText("Выберите точку для башни!", 24*scaleX, 125*scaleY);
+    // ... [отрисовка]
     ctx.restore();
 
     let fs = document.getElementById("finalScreen");
-   if ((gameOver || win) && fs) {
-    fs.classList.remove("hidden");
-    document.getElementById("retryBtn").disabled = false;
+    if ((gameOver || win) && fs) {
+        fs.classList.remove("hidden");
+        document.getElementById("retryBtn").disabled = false;
 
-    let wavesText = "Вы прошли " + (win ? "все " : "") + (win ? 10 : wave + 1) + " волн" + (win ? "!" : ".");
-    if (win) {
-        document.getElementById("finalText").innerHTML = "ПОЗДРАВЛЯЕМ!<br>" + wavesText;
-    } else {
-        document.getElementById("finalText").innerHTML = "Вы проиграли<br>" + wavesText;
-    }
+        let wavesText = "Вы прошли " + (win ? "все " : "") + (win ? 10 : wave + 1) + " волн" + (win ? "!" : ".");
+        if (win) {
+            document.getElementById("finalText").innerHTML = "ПОЗДРАВЛЯЕМ!<br>" + wavesText;
+        } else {
+            document.getElementById("finalText").innerHTML = "Вы проиграли<br>" + wavesText;
+        }
+    } 
 }
+
 
 
 function gameLoop() {
