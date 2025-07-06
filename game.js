@@ -1,6 +1,25 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+const BASE_WIDTH = 960;
+const BASE_HEIGHT = 600;
+
+function resizeGameCanvas() {
+    let panelH = 90;   // высота верхней панели (примерно)
+    let hudH = 72;     // высота нижнего HUD (примерно)
+    let w = window.innerWidth;
+    let h = window.innerHeight - panelH - hudH;
+    let desiredRatio = BASE_WIDTH / BASE_HEIGHT;
+    if (w / h > desiredRatio) w = h * desiredRatio;
+    else h = w / desiredRatio;
+    canvas.width = Math.round(w);
+    canvas.height = Math.round(h);
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
+}
+window.addEventListener("resize", resizeGameCanvas);
+resizeGameCanvas();
+
 const path = [
     {x: 486, y:  0},   {x: 485, y:  40}, {x: 478, y:  70}, {x: 463, y: 100},
     {x: 446, y: 123},  {x: 425, y: 143}, {x: 415, y: 165}, {x: 419, y: 192},
@@ -9,6 +28,7 @@ const path = [
     {x: 456, y: 410},  {x: 490, y: 430}, {x: 530, y: 460}, {x: 549, y: 489},
     {x: 540, y: 515},  {x: 510, y: 535}, {x: 482, y: 555}, {x: 467, y: 600}
 ];
+
 const towerSpots = [
     {x: 410, y: 130}, {x: 580, y: 200}, {x: 355, y: 300}, {x: 530, y: 340}, {x: 440, y: 400}, {x: 600, y: 490},
     {x: 340, y: 200}, {x: 390, y: 520}
@@ -30,9 +50,8 @@ function resetGameVars() {
     pendingNextWave = false;
     started = false;
     win = false;
-    gameSpeed = 2;
+    gameSpeed = 2; // 2x стартовая скорость
 }
-
 resetGameVars();
 
 const towerTypes = [
@@ -97,8 +116,6 @@ loadSprites(allSprites, () => {
         document.getElementById("speed2x").classList.toggle("active", gameSpeed === 2);
     }
     updateSpeedButtons();
-
-    // START
     document.getElementById("startWaveBtn").onclick = () => {
         document.getElementById("startWaveBtn").classList.add("hidden");
         started = true;
@@ -106,7 +123,6 @@ loadSprites(allSprites, () => {
     };
     document.getElementById("startWaveBtn").classList.remove("hidden");
     hideHUD();
-    // Retry
     document.getElementById("retryBtn").onclick = () => {
         document.getElementById("finalScreen").classList.add("hidden");
         resetGameVars();
@@ -129,21 +145,25 @@ function drawBackground() {
 }
 
 function drawEnemies() {
+    let scaleX = canvas.width / BASE_WIDTH;
+    let scaleY = canvas.height / BASE_HEIGHT;
     for(let enemy of enemies) {
         let img = loadedSprites[enemy.sprite];
-        if(img) ctx.drawImage(img, enemy.x-18, enemy.y-18, 36, 36);
-        else { ctx.beginPath(); ctx.arc(enemy.x, enemy.y, 16, 0, Math.PI*2); ctx.fillStyle = "red"; ctx.fill(); }
+        let ex = enemy.x * scaleX;
+        let ey = enemy.y * scaleY;
+        let sz = 36 * scaleX;
+        if(img) ctx.drawImage(img, ex-sz/2, ey-sz/2, sz, sz);
+        else { ctx.beginPath(); ctx.arc(ex, ey, 16*scaleX, 0, Math.PI*2); ctx.fillStyle = "red"; ctx.fill(); }
         ctx.fillStyle = "#f44";
-        ctx.fillRect(enemy.x-16, enemy.y-22, 32, 4);
+        ctx.fillRect(ex-16*scaleX, ey-22*scaleY, 32*scaleX, 4*scaleY);
         ctx.fillStyle = "#4f4";
-        ctx.fillRect(enemy.x-16, enemy.y-22, 32 * Math.max(enemy.hp,0)/enemy.maxHp, 4);
-
+        ctx.fillRect(ex-16*scaleX, ey-22*scaleY, 32*scaleX * Math.max(enemy.hp,0)/enemy.maxHp, 4*scaleY);
         if (enemy.slowTicks && enemy.slowTicks > 0) {
             ctx.save();
             ctx.beginPath();
-            ctx.arc(enemy.x, enemy.y, 22, 0, Math.PI*2);
+            ctx.arc(ex, ey, 22*scaleX, 0, Math.PI*2);
             ctx.strokeStyle = "rgba(70,190,255,0.7)";
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 3 * scaleX;
             ctx.stroke();
             ctx.restore();
         }
@@ -151,17 +171,20 @@ function drawEnemies() {
 }
 
 function drawTowerSpots() {
+    let scaleX = canvas.width / BASE_WIDTH;
+    let scaleY = canvas.height / BASE_HEIGHT;
     towerSpots.forEach(spot => {
         const hasTower = towers.some(t => t.spot && t.spot.x === spot.x && t.spot.y === spot.y);
+        let sx = spot.x * scaleX, sy = spot.y * scaleY;
         ctx.save();
         ctx.beginPath();
-        ctx.arc(spot.x, spot.y, 24, 0, 2*Math.PI);
+        ctx.arc(sx, sy, 24*scaleX, 0, 2*Math.PI);
         if (!hasTower) {
             ctx.fillStyle = selectedTowerType !== null ? "#8ddc92" : "#ddd";
-            ctx.globalAlpha = 0.35;
+            ctx.globalAlpha = 0.33;
             ctx.fill();
             ctx.globalAlpha = 1;
-            ctx.lineWidth = 2.2;
+            ctx.lineWidth = 2.2 * scaleX;
             ctx.strokeStyle = selectedTowerType !== null ? "#5fad53" : "#bbb";
             ctx.stroke();
         }
@@ -170,37 +193,48 @@ function drawTowerSpots() {
 }
 
 function drawTowers() {
+    let scaleX = canvas.width / BASE_WIDTH;
+    let scaleY = canvas.height / BASE_HEIGHT;
     for (let t of towers) {
         const img = loadedSprites[t.sprite];
-        if (img) ctx.drawImage(img, t.x-24, t.y-24, 48, 48);
-        else { ctx.beginPath(); ctx.arc(t.x, t.y, 24, 0, Math.PI*2); ctx.fillStyle = "blue"; ctx.fill(); }
+        let tx = t.x * scaleX;
+        let ty = t.y * scaleY;
+        let sz = 48 * scaleX;
+        if (img) ctx.drawImage(img, tx-sz/2, ty-sz/2, sz, sz);
+        else { ctx.beginPath(); ctx.arc(tx, ty, 24*scaleX, 0, Math.PI*2); ctx.fillStyle = "blue"; ctx.fill(); }
         ctx.fillStyle = "#222";
-        ctx.font = "16px Segoe UI";
-        ctx.fillText("L" + (t.level||1), t.x-16, t.y+30);
+        ctx.font = `${16*scaleX}px Segoe UI`;
+        ctx.fillText("L" + (t.level||1), tx-16*scaleX, ty+30*scaleY);
     }
     if (selectedTower) {
+        let tx = selectedTower.x * scaleX;
+        let ty = selectedTower.y * scaleY;
         ctx.save();
         ctx.beginPath();
-        ctx.arc(selectedTower.x, selectedTower.y, selectedTower.range, 0, 2*Math.PI);
+        ctx.arc(tx, ty, selectedTower.range*scaleX, 0, 2*Math.PI);
         ctx.strokeStyle = "rgba(80,180,255,0.3)";
-        ctx.lineWidth = 6;
+        ctx.lineWidth = 6*scaleX;
         ctx.stroke();
         ctx.restore();
     }
 }
 
 function drawBullets() {
+    let scaleX = canvas.width / BASE_WIDTH;
+    let scaleY = canvas.height / BASE_HEIGHT;
     for (let b of bullets) {
+        let bx = b.x * scaleX;
+        let by = b.y * scaleY;
         ctx.save();
         ctx.beginPath();
-        ctx.arc(b.x, b.y, 10, 0, 2*Math.PI);
+        ctx.arc(bx, by, 10*scaleX, 0, 2*Math.PI);
         ctx.fillStyle = b.color || "#fff83a";
         ctx.globalAlpha = 0.98;
         ctx.shadowColor = "#fff";
-        ctx.shadowBlur = 14;
+        ctx.shadowBlur = 10*scaleX;
         ctx.fill();
         ctx.globalAlpha = 1;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3*scaleX;
         ctx.strokeStyle = "#f1c40f";
         ctx.stroke();
         ctx.restore();
@@ -328,20 +362,21 @@ function updateTowers() {
 }
 
 function drawUI() {
+    let scaleX = canvas.width / BASE_WIDTH;
+    let scaleY = canvas.height / BASE_HEIGHT;
     ctx.save();
     ctx.fillStyle = "rgba(28,28,32,0.85)";
-    ctx.fillRect(10,10,270,135);
+    ctx.fillRect(10*scaleX, 10*scaleY, 270*scaleX, 135*scaleY);
     ctx.fillStyle = "#fff";
-    ctx.font = "20px Segoe UI";
-    ctx.fillText("Золото: "+gold, 24, 42);
-    ctx.fillText("Волна: "+(wave+1)+"/10", 24, 72);
-    ctx.fillText("Жизни: "+lives, 24, 102);
-    ctx.font = "15px Segoe UI";
+    ctx.font = `${20*scaleX}px Segoe UI`;
+    ctx.fillText("Золото: "+gold, 24*scaleX, 42*scaleY);
+    ctx.fillText("Волна: "+(wave+1)+"/10", 24*scaleX, 72*scaleY);
+    ctx.fillText("Жизни: "+lives, 24*scaleX, 102*scaleY);
+    ctx.font = `${15*scaleX}px Segoe UI`;
     ctx.fillStyle = "#ddd";
-    ctx.fillText("Выберите точку для башни!", 24, 125);
+    ctx.fillText("Выберите точку для башни!", 24*scaleX, 125*scaleY);
     ctx.restore();
 
-    // Финальный экран — после победы/поражения
     let fs = document.getElementById("finalScreen");
     if ((gameOver || win) && fs) {
         fs.classList.remove("hidden");
@@ -394,9 +429,11 @@ function gameLoop() {
 canvas.addEventListener('click', function(e) {
     if (gameOver || win) return;
     if (!started) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = Math.round(e.clientX - rect.left);
-    const y = Math.round(e.clientY - rect.top);
+    let rect = canvas.getBoundingClientRect();
+    let scaleX = canvas.width / BASE_WIDTH;
+    let scaleY = canvas.height / BASE_HEIGHT;
+    let x = (e.clientX - rect.left) / scaleX;
+    let y = (e.clientY - rect.top) / scaleY;
 
     for (let t of towers) {
         if (Math.hypot(t.x - x, t.y - y) < 24) {
