@@ -1,40 +1,62 @@
-body {
+html, body {
+    height: 100%;
     margin: 0;
+    padding: 0;
     background: #191919;
     font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
 }
 #gameWrapper {
     position: relative;
-    width: 960px;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+#gameCanvas {
+    display: block;
     margin: 0 auto;
+    border-radius: 18px;
+    box-shadow: 0 4px 22px rgba(0,0,0,0.7);
+    width: 100vw;
+    height: calc(100vh - 172px);
+    background: #444 url('assets/map_bg.png') center/cover no-repeat;
+    max-width: 100vw;
+    max-height: 100vh;
 }
 #towerPanel {
     display: flex;
     justify-content: center;
-    gap: 18px;
-    margin-top: 18px;
-    margin-bottom: 4px;
+    gap: 12px;
+    margin-top: 6px;
+    margin-bottom: 3px;
     z-index: 10;
 }
 .tower-btn {
     border: 2px solid #444;
-    border-radius: 8px;
+    border-radius: 10px;
     background: #fff;
     padding: 4px 6px;
     cursor: pointer;
     transition: 0.1s;
-    width: 60px;
+    width: 16vw;
+    max-width: 62px;
+    min-width: 46px;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     user-select: none;
+    font-size: 3.5vw;
 }
 .tower-btn.selected {
     border: 2px solid #f1c40f;
     background: #ffe58f;
 }
 .tower-btn img {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     display: block;
     margin: 0 auto 2px auto;
 }
@@ -43,22 +65,15 @@ body {
     color: #333;
 }
 .tower-btn .cost {
-    font-size: 10px;
+    font-size: 11px;
     color: #666;
-}
-#gameCanvas {
-    display: block;
-    margin: 0 auto 0 auto;
-    border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-    background: #444 url('assets/map_bg.png') center/cover no-repeat;
 }
 #speedPanel {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin-top: 10px;
-    margin-bottom: 2px;
+    gap: 10px;
+    margin-top: 4px;
+    margin-bottom: 4px;
     z-index: 20;
 }
 .speed-btn {
@@ -67,7 +82,7 @@ body {
     border: 2px solid #f1c40f;
     color: #222;
     border-radius: 8px;
-    padding: 7px 20px;
+    padding: 7px 24px;
     cursor: pointer;
     font-weight: bold;
     transition: 0.1s;
@@ -83,28 +98,27 @@ body {
 #startWaveBtn {
     position: absolute;
     left: 50%;
-    top: 48%;
+    top: 52%;
     transform: translate(-50%, -50%);
-    font-size: 2.3rem;
+    font-size: 2.2rem;
     font-weight: bold;
-    padding: 20px 72px;
-    border-radius: 22px;
+    padding: 16px 52px;
+    border-radius: 16px;
     border: none;
     background: #f1c40f;
     color: #232323;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.16);
     cursor: pointer;
     z-index: 200;
 }
 #startWaveBtn.hidden {
     display: none;
 }
-/* Финальный экран */
 #finalScreen {
     position: absolute;
     left: 0; top: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: calc(100vh - 0px);
     background: rgba(24,24,32,0.97);
     border-radius: 24px;
     display: flex;
@@ -117,21 +131,21 @@ body {
 #finalScreen.hidden { display: none; }
 #finalText {
     color: #fff;
-    font-size: 2.6rem;
+    font-size: 2.1rem;
     font-weight: bold;
     margin-bottom: 32px;
     text-align: center;
 }
 #retryBtn {
-    padding: 16px 48px;
-    font-size: 1.5rem;
+    padding: 14px 42px;
+    font-size: 1.4rem;
     border-radius: 14px;
     border: none;
     background: #10b981;
     color: #fff;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.13);
     transition: 0.18s;
 }
 #retryBtn:active {
@@ -146,13 +160,13 @@ body {
     background: rgba(32,32,40,0.98);
     border-radius: 0 0 20px 20px;
     box-shadow: 0 -2px 24px rgba(0,0,0,0.15);
-    min-height: 74px;
+    min-height: 62px;
     z-index: 99;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 40px;
-    padding: 16px 0;
+    gap: 36px;
+    padding: 12px 0;
     transition: 0.3s;
 }
 #bottomHUD.hidden { display: none; }
