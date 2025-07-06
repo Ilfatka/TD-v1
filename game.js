@@ -378,17 +378,18 @@ function drawUI() {
     ctx.restore();
 
     let fs = document.getElementById("finalScreen");
-    if ((gameOver || win) && fs) {
-        fs.classList.remove("hidden");
-        document.getElementById("retryBtn").disabled = false;
-        if (win) {
-            document.getElementById("finalText").innerHTML = "ПОЗДРАВЛЯЕМ!<br>Вы прошли все 10 волн!";
-        } else {
-            document.getElementById("finalText").innerHTML = "Вы проиграли";
-        }
+   if ((gameOver || win) && fs) {
+    fs.classList.remove("hidden");
+    document.getElementById("retryBtn").disabled = false;
+
+    let wavesText = "Вы прошли " + (win ? "все " : "") + (win ? 10 : wave + 1) + " волн" + (win ? "!" : ".");
+    if (win) {
+        document.getElementById("finalText").innerHTML = "ПОЗДРАВЛЯЕМ!<br>" + wavesText;
+    } else {
+        document.getElementById("finalText").innerHTML = "Вы проиграли<br>" + wavesText;
     }
-    if (!gameOver && !win && fs) fs.classList.add("hidden");
 }
+
 
 function gameLoop() {
     if (!started) return;
